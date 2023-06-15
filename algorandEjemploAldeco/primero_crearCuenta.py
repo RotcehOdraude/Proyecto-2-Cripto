@@ -47,6 +47,6 @@ def leer_cuentas_deArchivo(archivo):
         for linea in file:
             linea = linea.strip()  # Eliminar espacios en blanco al inicio y final de la línea
             if linea:
-                clave, direccion = linea.split(",")  # Dividir la línea en clave y dirección
+                direccion, clave = linea.split(",")  # Dividir la línea en clave y dirección
                 cuentas.append(Cuenta(clave, direccion))  
     return cuentas

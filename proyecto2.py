@@ -1,3 +1,4 @@
+import os
 import algorandEjemploAldeco.primero_crearCuenta as PRIMERO
 ### CREACION DE CUENTAS INVOLUCRADAS EN EL PROYECTO ####
 '''
@@ -11,10 +12,26 @@ import algorandEjemploAldeco.primero_crearCuenta as PRIMERO
 '''
 
 # Generando llave privada de cuenta A y su dirección
-cuenta_A, _ = PRIMERO.generar_cuenta()
+cuenta_BM, _ = PRIMERO.generar_cuenta()
+cuenta_C, _ = PRIMERO.generar_cuenta()
+cuenta_S, _ = PRIMERO.generar_cuenta()
+cuenta_H, _ = PRIMERO.generar_cuenta()
+cuenta_P, _ = PRIMERO.generar_cuenta()
+cuenta_D, _ = PRIMERO.generar_cuenta()
+cuenta_E, _ = PRIMERO.generar_cuenta()
 
-# Almacenando en un archivo de texto la llave privada y la dirección de la cuenta A
-with open("cuentas.txt", "w") as archivo:
-    archivo.write(f"{cuenta_A.llave_privada},{cuenta_A.direccion}\n")
+# ¡Importante¡: En este proyecto se almacenan las llaves privadas de las cuentas en un archivo de texto solo con fines didacticos. Idealmente, las llaves privadas deben ser almacenadas en un lugar seguro y no deben ser compartidas con nadie.
 
-    
+nombre_archivo = "cuentas.txt"
+
+if os.path.exists(nombre_archivo):
+    # Si el archivo con las direcciones de las cuentas y sus PKs existe, entonces ya no se crean nuevas cuentas.
+    print("El archivo existe. Ya hay cuentas creadas.")
+else:
+    # Si el archivo con las direcciones de las cuentas y sus PKs no existe, entonces se crean nuevas cuentas.
+    print("El archivo no existe. Se crean nuevas cuentas.")
+    lista_de_cuentas = [cuenta_BM, cuenta_C, cuenta_S, cuenta_H, cuenta_P, cuenta_D, cuenta_E]
+    for cuenta in lista_de_cuentas:
+        # Almacenando en un archivo de texto la llave privada y la dirección de la cuenta A
+        with open(nombre_archivo, "a") as archivo:
+            archivo.write(f"{cuenta.direccion},{cuenta.llave_privada}\n")
