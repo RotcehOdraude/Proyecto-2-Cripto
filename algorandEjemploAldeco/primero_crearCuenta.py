@@ -11,7 +11,7 @@ def generar_cuenta():
     Genera una nueva llave privada y la dirección de cuenta asociada.
 
     Returns:
-        Tuple: Una tupla que contiene la llave privada generada, la dirección de cuenta y el mnemónico de la llave privada.
+        Tuple: Una tupla que contiene (la dirección de cuenta, la llave privada generada) y el mnemónico de la llave privada.
     
     Raises:
         None.
@@ -32,15 +32,18 @@ def generar_cuenta():
 
 def leer_cuentas_deArchivo(archivo):
     """
-    Lee un archivo y procesa cada línea para obtener un diccionario de cuentas numeradas.
+    Lee un archivo y devuelve una lista de objetos Cuenta.
 
     Parámetros:
-    - archivo (str): El nombre del archivo a leer.
+    - archivo (str): Ruta del archivo a leer.
 
     Retorna:
-    - dict: Un diccionario donde sus elementos son las cuentas generadas y almacenadas en el archivo [archivo].txt,
-             y los valores son tuplas que contienen la clave y la dirección leídas de cada cuenta.
+    - cuentas (list): Lista de objetos 'Cuenta' creados a partir de los datos del archivo.
 
+    La función lee el archivo especificado y crea objetos Cuenta a partir de cada línea válida.
+    Cada línea del archivo debe contener una dirección y una clave, separadas por una coma.
+    Se eliminan los espacios en blanco al inicio y final de cada línea.
+    Los objetos Cuenta se agregan a la lista cuentas, que se devuelve al final de la función.
     """
     cuentas = []
     with open(archivo, "r") as file:
