@@ -1,3 +1,4 @@
+*.txt
 **/__pycache__/
 .vscode/
-/algorand_venv
+/algorand_venv/
