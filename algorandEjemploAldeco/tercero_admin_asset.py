@@ -14,7 +14,7 @@ def print_created_asset(algodclient, address, assetid):
         scrutinized_asset = account_info['created-assets'][idx]
         idx = idx + 1
         if (scrutinized_asset['index'] == assetid):
-            print("Asset ID: {}".format(scrutinized_asset['index']))
+            print("... Asset ID: {}".format(scrutinized_asset['index']))
             print(json.dumps(my_account_info['params'], indent=4))
             break
 
@@ -92,13 +92,13 @@ def imprimir_transaccion_activo(algod_client, confirmed_txn, tx_id, sender):
     - accounts (list): Una lista de cuentas involucradas en la transacción de activo.
 
     """
-    print("Transaction information: {}".format(
-        json.dumps(confirmed_txn, indent=4)))
+    #print("Transaction information:\n {}".format(json.dumps(confirmed_txn, indent=4)))
     try:
         asset_id = obtener_asset_id(algod_client, tx_id)
-
+        print("... Created asset")
         print_created_asset(algod_client, sender, asset_id)
-        print_asset_holding(algod_client, sender, asset_id)
+        # print("### Asset holding ###")
+        # print_asset_holding(algod_client, sender, asset_id)
     except Exception as e:
         print(e)
 

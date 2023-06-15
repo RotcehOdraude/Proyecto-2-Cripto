@@ -35,7 +35,7 @@ def conexion_con_cliente_algod(red = "algonode", algod_token = None, api_key = N
         #)
         pass
     elif (red == "algonode"):
-        print("Conectando con AlgoNode")
+        print("... Conectando con AlgoNode")
         #Si usas AlgoNode
         algod_client = algod.AlgodClient(
             algod_token = "",
@@ -71,7 +71,7 @@ def verficar_balance_cuenta(algod_client, my_address):
     """
     try:
         account_info = algod_client.account_info(my_address)
-        print("Account balance: {} microAlgos".format(account_info.get('amount')) + "\n")
+        #print("Account balance: {} microAlgos".format(account_info.get('amount')) + "\n")
         return account_info.get('amount'), account_info
     except Exception as e:
         print(e)
@@ -135,7 +135,7 @@ def enviar_transaccion(algod_client,signed_txn):
     """
     try:
         tx_id = algod_client.send_transaction(signed_txn)
-        print("Successfully sent transaction with txID: {}".format(tx_id))
+        print("... Successfully sent transaction with txID: {}".format(tx_id))
 
         # wait for confirmation
         confirmed_txn = transaction.wait_for_confirmation(algod_client, tx_id, 4)

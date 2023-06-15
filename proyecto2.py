@@ -1,5 +1,7 @@
 import os
 import algorandEjemploAldeco.primero_crearCuenta as PRIMERO
+import algorandEjemploAldeco.segundo_first_transaction_example as SEGUNDO
+import algorandEjemploAldeco.tercero_admin_asset as TERCERO
 ### CREACION DE CUENTAS INVOLUCRADAS EN EL PROYECTO ####
 '''
 1. (BM) Banco de Mexico: Este es el ente que creara la moneda digital a ser utilizada como dinero fiat.
@@ -17,7 +19,7 @@ nombre_archivo = "cuentas.txt"
 
 if os.path.exists(nombre_archivo):
     # Si el archivo con las direcciones de las cuentas y sus PKs existe, entonces ya no se crean nuevas cuentas.
-    print("El archivo existe. Ya hay cuentas creadas.")
+    print(f"El archivo '{nombre_archivo}' existe. Ya hay cuentas creadas.")
     lista_de_cuentas = PRIMERO.leer_cuentas_deArchivo(nombre_archivo)
 
     cuenta_BM = lista_de_cuentas[0]
@@ -30,7 +32,7 @@ if os.path.exists(nombre_archivo):
 else:
     # Si el archivo con las direcciones de las cuentas y sus PKs no existe, entonces se crean nuevas cuentas.
     # Generando llave privada de cuenta A y su dirección
-    print("El archivo no existe. Se crean nuevas cuentas.")
+    print(f"El archivo '{nombre_archivo}' no existe. Se crean nuevas cuentas.")
 
     cuenta_BM, _ = PRIMERO.generar_cuenta()
     cuenta_C, _ = PRIMERO.generar_cuenta()
@@ -54,3 +56,64 @@ print("Cuenta H:", cuenta_H.direccion)
 print("Cuenta P:", cuenta_P.direccion)
 print("Cuenta D:", cuenta_D.direccion)
 print("Cuenta E:", cuenta_E.direccion)
+
+### CREACION DE ACTIVOS ###
+'''
+Para el proyecto se crearan 2 activos:
+1. (MXN) Peso Mexicano: Este activo representará la moneda fiat de Mexico.
+2. Insumos Medicos: Este activo o activos representarán los insumos médicos que se utilizaran en el Hospital.
+    a) (caja_jer) Insumo Medico 1: Este activo representará jeringas.
+    b) (caja_cub) Insumo Medico 2: Este activo representará cubrebocas.
+
+El activo MXN será creado por el Banco de México (BM) y sera quien pague los fees en Algorand por la creacion de este activo.
+Los activos de insumos medicos seran creados por el Hospital (H) y sera quien pague los fees en Algorand por la creacion de estos activos.
+'''
+
+# Creando activo MXN
+print("\n### Creando activo MXN ###")
+print(f"Cuenta creadora del activo MXN es (BM), con dirección: {cuenta_BM.direccion}\n")
+
+# ¡Importante¡: No olvides añadir fondos a la cuenta creadora del activo
+# URL: https://testnet.algoexplorer.io/dispenser
+#input(f"Presiona enter hasta haber añadido fondos a la cuenta del creador del activo:{creador_del_activo.direccion}\n")
+
+# Conexión con el cliente
+algod_client = SEGUNDO.conexion_con_cliente_algod(red="algonode")
+
+# Revisando saldo de la cuenta
+saldo_BM, account_info_BM = SEGUNDO.verficar_balance_cuenta(algod_client, cuenta_BM.direccion)
+print(f"Saldo de la cuenta (BM) es: {saldo_BM} microAlgos\n")
+
+if(saldo_BM > 10000):
+    # Creamos un activo
+    '''
+        El activo MXN tendrá las siguientes características:
+        1. Sera creado por el Banco de México (BM)
+        2. Será administrado por el Banco de México (BM)
+        3. La cuenta de reserva será la cuenta del Banco de México (BM)
+        4. La cuenta de congelación será la cuenta del Banco de México (BM)
+        5. La cuenta de revocación será la cuenta del Banco de México (BM)
+    '''
+    sender = cuenta_BM.direccion
+    manager = cuenta_BM.direccion
+    reserve = cuenta_BM.direccion
+    freeze = cuenta_BM.direccion
+    clawback = cuenta_BM.direccion
+
+    confirmed_txn, tx_id = TERCERO.crear_activo(
+        algod_client,
+        cuenta_BM.llave_privada, 
+        sender, 
+        manager, 
+        reserve, 
+        freeze, 
+        clawback,
+        asset_name="MXN", # Max 8 caracteres
+        unit_name="peso(s)" # Max 8 caracteres
+    )
+
+    # Impriendo la transacción del activo
+    TERCERO.imprimir_transaccion_activo(algod_client, confirmed_txn, tx_id, cuenta_BM.direccion)
+else:
+    print("No hay fondos suficientes en la cuenta para crear el activo.")
+
