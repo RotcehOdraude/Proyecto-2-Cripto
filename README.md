@@ -47,14 +47,28 @@ A continuación se detallan los pasos para poner en marcha el proyecto en tu ent
    - En macOS/Linux:
 
     ``` shell
-    source myenv/bin/activate
+    source algorand_venv/bin/activate
     ```
 
-4. **Instalar el paquete py-algorand-sdk**: Instala el paquete `py-algorand-sdk`, que es necesario para el funcionamiento del proyecto.
+4. **Revisar los paquetes instalados**: Revisa los paquetes instalados en el entorno virtual activado.
 
     ``` shell
-    pip install py-algorand-sdk
+    pip list
     ```
+
+    Si pip te sugiere que actualices pip, puedes hacerlo ejecutando el siguiente comando:
+
+    ``` shell
+    python.exe -m pip install --upgrade pip
+    ```
+
+5. **Instalar el paquete py-algorand-sdk**: Instala el paquete `py-algorand-sdk`, que es necesario para el funcionamiento del proyecto. En este caso se instalará la última versión disponible.
+
+    ``` shell
+    pip install py-algorand-sdk --upgrade
+    ```
+
+    En caso de que la última version de este paquete cause problemas, instala la version 2.3.0. que es la version que se utilizó para el desarrollo del proyecto.
 
 ## Requisitos previos
 
