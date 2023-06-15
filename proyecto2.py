@@ -5,7 +5,7 @@ import algorandEjemploAldeco.tercero_admin_asset as TERCERO
 ### CREACION DE CUENTAS INVOLUCRADAS EN EL PROYECTO ####
 '''
 1. (BM) Banco de Mexico: Este es el ente que creara la moneda digital a ser utilizada como dinero fiat.
-2. (C) Cuenta ciudadanos: Este ente representara a un conjunto de ciudadanos que pagana sus impuestos a hacienda.
+2. (C) Cuenta ciudadanos: Este ente representara a un conjunto de ciudadanos que pagan sus impuestos a hacienda.
 3. (S) SAT: Este ente representará al Servicio de Administración Tributaria, el cual es el encargado de recaudar los impuestos de los ciudadanos. Y redigirigir parte de lo recaudado a Hospitales Publicos.
 4. (H) Hospital: Este ente representará a un Hospital Publico, el cual recibirá parte de los impuestos recaudados por el SAT. Además se encargara de la creacion de nuevos activos que reprentaran isumos medicos.
 5. (P) Proveedores: Este ente se encargará de suministrar insumos medicos al Hospital. Recibiendo activos de una moneda y entregando activos de otro tipo, en este caso insumos médicos solicitaos por el Hospital.
@@ -105,17 +105,7 @@ if(saldo_BM > 10000):
     freeze = cuenta_BM.direccion
     clawback = cuenta_BM.direccion
 
-    confirmed_txn, tx_id = TERCERO.crear_activo(
-        algod_client,
-        sender_pk, 
-        sender, 
-        manager, 
-        reserve, 
-        freeze, 
-        clawback,
-        asset_name=activo_1_nombre, # Max 8 caracteres
-        unit_name=activo_1_unidad # Max 8 caracteres
-    )
+    confirmed_txn, tx_id = TERCERO.crear_activo(algod_client, sender_pk, sender, manager, reserve, freeze, clawback, asset_name=activo_1_nombre, unit_name=activo_1_unidad) # Max 8 caracteres para ambos unit_name y asset_name
 
     TERCERO.imprimir_transaccion_activo(algod_client, confirmed_txn, tx_id, cuenta_BM.direccion)
 else:
@@ -154,17 +144,7 @@ if(saldo_H > 10000):
     freeze = cuenta_H.direccion
     clawback = cuenta_H.direccion
 
-    confirmed_txn, tx_id = TERCERO.crear_activo(
-        algod_client,
-        sender_pk, 
-        sender, 
-        manager, 
-        reserve, 
-        freeze, 
-        clawback,
-        asset_name=activo_2_nombre, # Max 8 caracteres
-        unit_name=activo_2_unidad # Max 8 caracteres
-    )
+    confirmed_txn, tx_id = TERCERO.crear_activo(algod_client, sender_pk, sender, manager, reserve, freeze, clawback, asset_name=activo_1_nombre, unit_name=activo_1_unidad) # Max 8 caracteres para ambos unit_name y asset_name
 
     TERCERO.imprimir_transaccion_activo(algod_client, confirmed_txn, tx_id, cuenta_H.direccion)
 else:
