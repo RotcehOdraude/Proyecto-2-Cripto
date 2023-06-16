@@ -105,9 +105,9 @@ if(saldo_BM > 10000):
     freeze = cuenta_BM.direccion
     clawback = cuenta_BM.direccion
 
-    confirmed_txn, tx_id = TERCERO.crear_activo(algod_client, sender_pk, sender, manager, reserve, freeze, clawback, asset_name=activo_1_nombre, unit_name=activo_1_unidad) # Max 8 caracteres para ambos unit_name y asset_name
+    confirmed_txn_activo_1, tx_id_activo_1 = TERCERO.crear_activo(algod_client, sender_pk, sender, manager, reserve, freeze, clawback, asset_name=activo_1_nombre, unit_name=activo_1_unidad) # Max 8 caracteres para ambos unit_name y asset_name
 
-    TERCERO.imprimir_transaccion_activo(algod_client, confirmed_txn, tx_id, cuenta_BM.direccion)
+    TERCERO.imprimir_transaccion_activo(algod_client, confirmed_txn_activo_1, tx_id_activo_1, cuenta_BM.direccion)
 else:
     print("No hay fondos suficientes en la cuenta para crear el activo.")
 
@@ -144,8 +144,56 @@ if(saldo_H > 10000):
     freeze = cuenta_H.direccion
     clawback = cuenta_H.direccion
 
-    confirmed_txn, tx_id = TERCERO.crear_activo(algod_client, sender_pk, sender, manager, reserve, freeze, clawback, asset_name=activo_1_nombre, unit_name=activo_1_unidad) # Max 8 caracteres para ambos unit_name y asset_name
+    confirmed_txn_activo_2, tx_id_activo_2 = TERCERO.crear_activo(algod_client, sender_pk, sender, manager, reserve, freeze, clawback, asset_name=activo_1_nombre, unit_name=activo_1_unidad) # Max 8 caracteres para ambos unit_name y asset_name
 
-    TERCERO.imprimir_transaccion_activo(algod_client, confirmed_txn, tx_id, cuenta_H.direccion)
+    TERCERO.imprimir_transaccion_activo(algod_client, confirmed_txn_activo_2, tx_id_activo_2, cuenta_H.direccion)
 else:
     print("No hay fondos suficientes en la cuenta para crear el activo.")
+
+### TRANSACCIONES ###
+'''
+Para este proyecto se plantea el siguiente escenario de transacciones:
+    1. El Banco de México (BM) crea la moneda (peso) que utilizamos para realizar transacciones entre personas [Completado]
+    2. El Banco de México (BM) realiza una transaccion/es a los ciudadanos de un país, les el activo (pesos)
+    3. Los ciudadanos (C) pagan sus impuesto y realizan una transaccion al SAT(S)
+    4. El SAT (S) reparte lo recaudado y realiza una transacción al hospital (H)
+    5. El hospital (H) es una enctidad que crea activos de distintos insumos medicos, para este proyecto solo seran jerigas. El hospital podrá realizar transacciones con los empleados del hospital, Doctor (D) y Enfermera (E) y con el proveedor de insumos medicos (P)
+    6. El hospital (H) realiza una transacción al proveedor (P) para adquirir insumos medicos.
+    7. El proveedor (P) realiza una transacción al hospital (H) para enviarle los insumos medicos y recibir el pago en pesos.
+    8. El hospital (H) realiza una transacción de insumos medicos ya sea al doctor (D) o a la enfermera (E)
+    9. Por último el doctor (D) o la enfermera (E) realizan una transacción al paciente (P) quien es el beneficiario final de toda esta cadena de transacciones.
+
+ '''
+
+# TRANSACCIÓN 1: Banco de México (BM) crea activo (peso)[Completado]
+
+# Activo 1 = peso
+# Activo 2 = caja de jeringas
+
+# TRANSACCIÓN 2: Banco de México (BM) ------> Ciudadanos (C); (BM) envía activo (peso) a los ciudadanos (C)
+print(f"### (BM) enviando activo (peso) a los ciudadanos (C) ###")
+
+# Obtenemos el id del activo (peso)
+asset_id_peso = TERCERO.obtener_asset_id(algod_client,tx_id_activo_1)
+
+# ¡Importante¡: No olvides añadir fondos a la cuenta que va a pagar por la transacción, en este caso Ciudadano (C).
+
+saldo_C, account_info_C = SEGUNDO.verficar_balance_cuenta(algod_client, cuenta_C.direccion)
+print(f"Saldo de la cuenta (C) es: {saldo_C} microAlgos\n")
+
+# Primero el ciudadando (C) debe hacer una operación OPT-IN para poder recibir el activo (peso)
+confirmed_txn, txid = TERCERO.opt_in(algod_client, asset_id_peso, cuenta_C.direccion, cuenta_C.llave_privada)
+
+print("... TXID: ", txid)
+print("... Result confirmed in round: {}".format(confirmed_txn['confirmed-round']))
+print(f"La cuenta (C) con dirección: {cuenta_C.direccion} tiene la siguiente información del activo (peso):")
+TERCERO.print_asset_holding(algod_client, cuenta_C.direccion, asset_id_peso)
+
+confirmed_txn, txid = TERCERO.transferir_activo(algod_client ,cuenta_BM.direccion, cuenta_BM.llave_privada, cuenta_C.direccion, 10, asset_id_peso)
+
+print("...TXID: ", txid)
+print("...Result confirmed in round: {}".format(confirmed_txn['confirmed-round']))
+print(f"La cuenta (C) con dirección: {cuenta_C.direccion} tiene la siguiente información del activo (peso):")
+TERCERO.print_asset_holding(algod_client, cuenta_C.direccion, asset_id_peso)
+
+

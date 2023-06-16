@@ -43,7 +43,7 @@ def crear_activo(algod_client, sender_private_key ,sender, manager, reserve, fre
     unsigned_txn = AssetConfigTxn(
         sender = sender,
         sp = params,
-        total = 1000,
+        total = 100,
         default_frozen = False,
         unit_name = unit_name,
         asset_name = asset_name,
