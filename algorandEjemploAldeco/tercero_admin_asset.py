@@ -9,7 +9,7 @@ LLAVE_PRIVADA_DE_X = 0 # Usado para la tupla (llave_privada_X,direccion_cuenta_X
 #  Función de utilidad para imprimir el activo creado para la cuenta y el assetid
 def print_created_asset(algodclient, address, assetid):
     account_info = algodclient.account_info(address)
-    idx = 0;
+    idx = 0
     for my_account_info in account_info['created-assets']:
         scrutinized_asset = account_info['created-assets'][idx]
         idx = idx + 1
@@ -20,17 +20,35 @@ def print_created_asset(algodclient, address, assetid):
 
 
 #Función de utilidad para imprimir la tenencia de activos para la cuenta y assetid
-def print_asset_holding(algodclient, address, assetid):
+def print_asset_holding(algodclient,address, assetid, display="short"):
     account_info = algodclient.account_info(address)
+    asset_info = algodclient.asset_info(assetid)
+
+    asset_unit_name = ""
+    sender_address = ""
+    asset_id = ""
+    saldo = ""
+
     idx = 0
     for my_account_info in account_info['assets']:
         scrutinized_asset = account_info['assets'][idx]
         idx = idx + 1
         if (scrutinized_asset['asset-id'] == assetid):
-            print("Asset ID: {}".format(scrutinized_asset['asset-id']))
-            print(json.dumps(scrutinized_asset, indent=4))
+            #print("Asset ID: {}".format(scrutinized_asset['asset-id']))
+            #print(json.dumps(scrutinized_asset, indent=4))
+            sender_address = address
+            asset_id = scrutinized_asset['asset-id']
+            asset_unit_name = asset_info['params']['unit-name']
+            saldo = scrutinized_asset['amount']
             break
-
+    if(display == "short"):
+        print(f"{saldo} {asset_unit_name}")
+    else:
+        print("Sender-address: ",address)
+        print("Asset-id: ",scrutinized_asset['asset-id'])
+        print("Asset-name: ",asset_unit_name)
+        print("Saldo: ",scrutinized_asset['amount'])
+    
 
 # Crear un activo
 def crear_activo(algod_client, sender_private_key ,sender, manager, reserve, freeze, clawback, asset_name = "Jeringas", unit_name = "Jeringa",url = "https://path/to/my/asset/details", decimals = 0):
@@ -129,6 +147,11 @@ def opt_in(algod_client, asset_id, opt_adress,opt_private_key):
     holding = None
     idx = 0
 
+    saldo, account_info = SEGUNDO.verficar_balance_cuenta(algod_client,opt_adress)
+    print(f"... Opt-transaction:")
+    print(f"    - opt-adress: {opt_adress}")
+    print(f"    - Balance: {saldo} microAlgos\n")
+
     for my_account_info in account_info['assets']:
         scrutinized_asset = account_info['assets'][idx]
         idx = idx + 1
@@ -169,6 +192,7 @@ def transferir_activo(algod_client,sender_address,sender_private_key,receiver_ad
 
     # Se envia la transacción a la red
     confirmed_txn, txid = SEGUNDO.enviar_transaccion(algod_client,stxn)
+    print("... Activo transferido")
 
     return confirmed_txn, txid
 
@@ -222,3 +246,10 @@ def destruir_activo(algod_client,asset_id,destructor, destructor_llave_privada):
 
     confirmed_txn, tx_id = SEGUNDO.enviar_transaccion(algod_client,stxn)
     return confirmed_txn, tx_id
+
+def print_saldo_cuentas(algod_client,asset_id,cuenta_1,cuenta_2):
+    print(f"\nLa cuenta {cuenta_1.nombre_cuenta} tiene:")
+    print_asset_holding(algod_client,cuenta_1.direccion, asset_id)
+
+    print(f"\nLa cuenta {cuenta_2.nombre_cuenta} tiene:")
+    print_asset_holding(algod_client,cuenta_2.direccion, asset_id)

@@ -49,6 +49,14 @@ else:
         with open(nombre_archivo, "a") as archivo:
             archivo.write(f"{cuenta.direccion},{cuenta.llave_privada}\n")
 
+cuenta_BM.nombre_cuenta = "(BM)"
+cuenta_C.nombre_cuenta = "(C)"
+cuenta_S.nombre_cuenta = "(S)"
+cuenta_H.nombre_cuenta = "(H)"
+cuenta_P.nombre_cuenta = "(P)"
+cuenta_D.nombre_cuenta = "(D)"
+cuenta_E.nombre_cuenta = "(E)"
+
 print("Cuenta BM:", cuenta_BM.direccion)
 print("Cuenta C:", cuenta_C.direccion)
 print("Cuenta S:", cuenta_S.direccion)
@@ -165,35 +173,41 @@ Para este proyecto se plantea el siguiente escenario de transacciones:
 
  '''
 
-# TRANSACCIÓN 1: Banco de México (BM) crea activo (peso)[Completado]
+    # TRANSACCIÓN 1: Banco de México (BM) crea activo (peso)[Completado]
 
 # Activo 1 = peso
 # Activo 2 = caja de jeringas
 
-# TRANSACCIÓN 2: Banco de México (BM) ------> Ciudadanos (C); (BM) envía activo (peso) a los ciudadanos (C)
-print(f"### (BM) enviando activo (peso) a los ciudadanos (C) ###")
+    # TRANSACCIÓN 2: Banco de México (BM) ------> Ciudadanos (C); (BM) envía activo (peso) a los ciudadanos (C)
+print(f"\n### (BM) enviando activo (peso) a los ciudadanos (C) ###")
 
 # Obtenemos el id del activo (peso)
 asset_id_peso = TERCERO.obtener_asset_id(algod_client,tx_id_activo_1)
 
 # ¡Importante¡: No olvides añadir fondos a la cuenta que va a pagar por la transacción, en este caso Ciudadano (C).
 
-saldo_C, account_info_C = SEGUNDO.verficar_balance_cuenta(algod_client, cuenta_C.direccion)
-print(f"Saldo de la cuenta (C) es: {saldo_C} microAlgos\n")
-
 # Primero el ciudadando (C) debe hacer una operación OPT-IN para poder recibir el activo (peso)
 confirmed_txn, txid = TERCERO.opt_in(algod_client, asset_id_peso, cuenta_C.direccion, cuenta_C.llave_privada)
 
-print("... TXID: ", txid)
-print("... Result confirmed in round: {}".format(confirmed_txn['confirmed-round']))
-print(f"La cuenta (C) con dirección: {cuenta_C.direccion} tiene la siguiente información del activo (peso):")
-TERCERO.print_asset_holding(algod_client, cuenta_C.direccion, asset_id_peso)
+TERCERO.print_saldo_cuentas(algod_client, asset_id_peso,cuenta_BM, cuenta_C)
 
-confirmed_txn, txid = TERCERO.transferir_activo(algod_client ,cuenta_BM.direccion, cuenta_BM.llave_privada, cuenta_C.direccion, 10, asset_id_peso)
-
-print("...TXID: ", txid)
-print("...Result confirmed in round: {}".format(confirmed_txn['confirmed-round']))
-print(f"La cuenta (C) con dirección: {cuenta_C.direccion} tiene la siguiente información del activo (peso):")
-TERCERO.print_asset_holding(algod_client, cuenta_C.direccion, asset_id_peso)
+# Ahora el ciudadano (C) puede recibir el activo (peso)
+confirmed_txn, txid = TERCERO.transferir_activo(algod_client ,cuenta_BM.direccion, cuenta_BM.llave_privada, cuenta_C.direccion, 90, asset_id_peso)
 
 
+TERCERO.print_saldo_cuentas(algod_client, asset_id_peso,cuenta_BM, cuenta_C)
+
+    # TRANSACCIÓN 3: Ciudadanos (C) ------> SAT (S); (C) envía activo (peso) al SAT (S)
+print(f"\n### (C) enviando activo (peso) al SAT (S) ###")
+
+# ¡Importante¡: No olvides añadir fondos a la cuenta que va a pagar por la transacción, en este caso Ciudadano (S).
+
+# Primero el SAT (S) debe hacer una operación OPT-IN para poder recibir el activo (peso)
+confirmed_txn, txid = TERCERO.opt_in(algod_client, asset_id_peso, cuenta_S.direccion, cuenta_S.llave_privada)
+
+TERCERO.print_saldo_cuentas(algod_client, asset_id_peso,cuenta_C, cuenta_S)
+
+# Ahora el SAT (S) puede recibir el activo (peso)
+confirmed_txn, txid = TERCERO.transferir_activo(algod_client ,cuenta_C.direccion, cuenta_C.llave_privada, cuenta_S.direccion, 70, asset_id_peso)
+
+TERCERO.print_saldo_cuentas(algod_client, asset_id_peso,cuenta_C, cuenta_S)

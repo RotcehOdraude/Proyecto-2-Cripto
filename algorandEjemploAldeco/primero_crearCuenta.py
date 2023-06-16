@@ -5,6 +5,7 @@ class Cuenta:
     def __init__(self, llave_privada, direccion ):
         self.llave_privada = llave_privada
         self.direccion = direccion
+        self.nombre_cuenta = ""
 
 def generar_cuenta():
     """
