@@ -38,7 +38,7 @@ def print_asset_holding(algodclient,address, assetid, display="short"):
             #print(json.dumps(scrutinized_asset, indent=4))
             sender_address = address
             asset_id = scrutinized_asset['asset-id']
-            asset_unit_name = asset_info['params']['unit-name']
+            asset_unit_name = asset_info['params']['unit-name'] 
             saldo = scrutinized_asset['amount']
             break
     if(display == "short"):
@@ -51,7 +51,7 @@ def print_asset_holding(algodclient,address, assetid, display="short"):
     
 
 # Crear un activo
-def crear_activo(algod_client, sender_private_key ,sender, manager, reserve, freeze, clawback, asset_name = "Jeringas", unit_name = "Jeringa",url = "https://path/to/my/asset/details", decimals = 0):
+def crear_activo(algod_client, sender_private_key ,sender, manager, reserve, freeze, clawback, asset_name = "Jeringas", unit_name = "Jeringa",url = "https://path/to/my/asset/details", decimals = 0, total = 100):
     
     # Obtener parámetros de red para transacciones antes de cada transacción.
     params = algod_client.suggested_params()
@@ -61,7 +61,7 @@ def crear_activo(algod_client, sender_private_key ,sender, manager, reserve, fre
     unsigned_txn = AssetConfigTxn(
         sender = sender,
         sp = params,
-        total = 100,
+        total = total,
         default_frozen = False,
         unit_name = unit_name,
         asset_name = asset_name,

@@ -116,6 +116,9 @@ if(saldo_BM > 10000):
     confirmed_txn_activo_1, tx_id_activo_1 = TERCERO.crear_activo(algod_client, sender_pk, sender, manager, reserve, freeze, clawback, asset_name=activo_1_nombre, unit_name=activo_1_unidad) # Max 8 caracteres para ambos unit_name y asset_name
 
     TERCERO.imprimir_transaccion_activo(algod_client, confirmed_txn_activo_1, tx_id_activo_1, cuenta_BM.direccion)
+
+    # Obtenemos el id del activo (peso)
+    asset_id_peso = TERCERO.obtener_asset_id(algod_client,tx_id_activo_1)
 else:
     print("No hay fondos suficientes en la cuenta para crear el activo.")
 
@@ -127,8 +130,8 @@ Para este proyecto se plantea el siguiente escenario de transacciones:
     2. El Banco de México (BM) realiza una transaccion/es a los ciudadanos de un país, les el activo (pesos)
     3. Los ciudadanos (C) pagan sus impuesto y realizan una transaccion al SAT(S)
     4. El SAT (S) reparte lo recaudado y realiza una transacción al hospital (H)
-    5. El hospital (H) es una enctidad que crea activos de distintos insumos medicos, para este proyecto solo seran jerigas. El hospital podrá realizar transacciones con los empleados del hospital, Doctor (D) y Enfermera (E) y con el proveedor de insumos medicos (P)
-    6. El hospital (H) realiza una transacción al proveedor (P) para adquirir insumos medicos.
+    5. El proveedor (P) es una entidad que crea activos de distintos insumos medicos, para este proyecto solo seran jerigas. 
+    6. El hospital (H) realiza una transacción al proveedor (P) para adquirir insumos medicos.El hospital podrá realizar transacciones con los empleados del hospital, Doctor (D) y Enfermera (E) y con el proveedor de insumos medicos (P)
     7. El proveedor (P) realiza una transacción al hospital (H) para enviarle los insumos medicos y recibir el pago en pesos.
     8. El hospital (H) realiza una transacción de insumos medicos ya sea al doctor (D) o a la enfermera (E)
     9. Por último el doctor (D) o la enfermera (E) realizan una transacción al paciente (P) quien es el beneficiario final de toda esta cadena de transacciones.
@@ -142,9 +145,6 @@ Para este proyecto se plantea el siguiente escenario de transacciones:
 
     # TRANSACCIÓN 2: Banco de México (BM) ------> Ciudadanos (C); (BM) envía activo (peso) a los ciudadanos (C)
 print(f"\n### (BM) enviando activo (peso) a los ciudadanos (C) ###")
-
-# Obtenemos el id del activo (peso)
-asset_id_peso = TERCERO.obtener_asset_id(algod_client,tx_id_activo_1)
 
 # ¡Importante¡: No olvides añadir fondos a la cuenta que va a pagar por la transacción, en este caso Ciudadano (C).
 
@@ -185,41 +185,45 @@ confirmed_txn, txid = TERCERO.transferir_activo(algod_client ,cuenta_S.direccion
 
 TERCERO.print_saldo_cuentas(algod_client, asset_id_peso,cuenta_S, cuenta_H)
 
-# Creando activo caja_jer
+# Creando activo caja_jer (caja de jeringas) 
 activo_2_nombre = "caja_jer"
 activo_2_unidad = "jeringa"
-creador_activo_2 = "H"
+creador_activo_2 = "P"
 
 print(f"\n### Creando activo {activo_2_nombre} ###")
-print(f"Cuenta creadora del activo {activo_2_unidad} es ({creador_activo_2}), con dirección: {cuenta_H.direccion}\n")
+print(f"Cuenta creadora del activo {activo_2_unidad} es ({creador_activo_2}), con dirección: {cuenta_P.direccion}\n")
 
 # ¡Importante¡: No olvides añadir fondos a la cuenta creadora del activo
 # URL: https://testnet.algoexplorer.io/dispenser
 #input(f"Presiona enter hasta haber añadido fondos a la cuenta del creador del activo:{creador_del_activo.direccion}\n")
 
 # Revisando saldo de la cuenta
-saldo_H, account_info_H = SEGUNDO.verficar_balance_cuenta(algod_client, cuenta_H.direccion)
-print(f"Saldo de la cuenta ({creador_activo_2}) es: {saldo_BM} microAlgos\n")
+saldo_P, account_info_P = SEGUNDO.verficar_balance_cuenta(algod_client, cuenta_P.direccion)
+print(f"Saldo de la cuenta ({creador_activo_2}) es: {saldo_P} microAlgos\n")
 
-if(saldo_H > 10000):
+if(saldo_P > 10000):
     # Creamos un activo
     '''
-        El activo MXN tendrá las siguientes características:
-        1. Sera creado por el Banco de México (BM)
-        2. Será administrado por el Banco de México (BM)
-        3. La cuenta de reserva será la cuenta del Banco de México (BM)
-        4. La cuenta de congelación será la cuenta del Banco de México (BM)
-        5. La cuenta de revocación será la cuenta del Banco de México (BM)
+        El activo caja_jer tendrá las siguientes características:
+        1. Sera creado por el Hospital (H)
+        2. Será administrado por el Hospital (H)
+        3. La cuenta de reserva será la cuenta del Hospital (H)
+        4. La cuenta de congelación será la cuenta del Hospital (H)
+        5. La cuenta de revocación será la cuenta del Hospital (H)
     '''
-    sender = cuenta_H.direccion
-    sender_pk = cuenta_H.llave_privada
+    sender = cuenta_P.direccion
+    sender_pk = cuenta_P.llave_privada
     manager = cuenta_H.direccion
     reserve = cuenta_H.direccion
     freeze = cuenta_H.direccion
     clawback = cuenta_H.direccion
 
-    confirmed_txn_activo_2, tx_id_activo_2 = TERCERO.crear_activo(algod_client, sender_pk, sender, manager, reserve, freeze, clawback, asset_name=activo_1_nombre, unit_name=activo_1_unidad) # Max 8 caracteres para ambos unit_name y asset_name
+    confirmed_txn_activo_2, tx_id_activo_2 = TERCERO.crear_activo(algod_client, sender_pk, sender, manager, reserve, freeze, clawback, asset_name=activo_2_nombre, unit_name=activo_2_unidad,total=50) # Max 8 caracteres para ambos unit_name y asset_name
 
-    TERCERO.imprimir_transaccion_activo(algod_client, confirmed_txn_activo_2, tx_id_activo_2, cuenta_H.direccion)
+    TERCERO.imprimir_transaccion_activo(algod_client, confirmed_txn_activo_2, tx_id_activo_2, cuenta_P.direccion)
+    # Obtenemos el id del activo (peso)
+    asset_id_jeringas = TERCERO.obtener_asset_id(algod_client,tx_id_activo_2)
 else:
     print("No hay fondos suficientes en la cuenta para crear el activo.")
+
+#TERCERO.print_saldo_cuentas(algod_client, asset_id_jeringas,cuenta_P, cuenta_P)
