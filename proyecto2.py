@@ -119,44 +119,6 @@ if(saldo_BM > 10000):
 else:
     print("No hay fondos suficientes en la cuenta para crear el activo.")
 
-# Creando activo caja_jer
-activo_2_nombre = "caja_jer"
-activo_2_unidad = "jeringa"
-creador_activo_2 = "H"
-
-print(f"\n### Creando activo {activo_2_nombre} ###")
-print(f"Cuenta creadora del activo {activo_2_unidad} es ({creador_activo_2}), con dirección: {cuenta_H.direccion}\n")
-
-# ¡Importante¡: No olvides añadir fondos a la cuenta creadora del activo
-# URL: https://testnet.algoexplorer.io/dispenser
-#input(f"Presiona enter hasta haber añadido fondos a la cuenta del creador del activo:{creador_del_activo.direccion}\n")
-
-# Revisando saldo de la cuenta
-saldo_H, account_info_H = SEGUNDO.verficar_balance_cuenta(algod_client, cuenta_H.direccion)
-print(f"Saldo de la cuenta ({creador_activo_2}) es: {saldo_BM} microAlgos\n")
-
-if(saldo_H > 10000):
-    # Creamos un activo
-    '''
-        El activo MXN tendrá las siguientes características:
-        1. Sera creado por el Banco de México (BM)
-        2. Será administrado por el Banco de México (BM)
-        3. La cuenta de reserva será la cuenta del Banco de México (BM)
-        4. La cuenta de congelación será la cuenta del Banco de México (BM)
-        5. La cuenta de revocación será la cuenta del Banco de México (BM)
-    '''
-    sender = cuenta_H.direccion
-    sender_pk = cuenta_H.llave_privada
-    manager = cuenta_H.direccion
-    reserve = cuenta_H.direccion
-    freeze = cuenta_H.direccion
-    clawback = cuenta_H.direccion
-
-    confirmed_txn_activo_2, tx_id_activo_2 = TERCERO.crear_activo(algod_client, sender_pk, sender, manager, reserve, freeze, clawback, asset_name=activo_1_nombre, unit_name=activo_1_unidad) # Max 8 caracteres para ambos unit_name y asset_name
-
-    TERCERO.imprimir_transaccion_activo(algod_client, confirmed_txn_activo_2, tx_id_activo_2, cuenta_H.direccion)
-else:
-    print("No hay fondos suficientes en la cuenta para crear el activo.")
 
 ### TRANSACCIONES ###
 '''
@@ -211,3 +173,53 @@ TERCERO.print_saldo_cuentas(algod_client, asset_id_peso,cuenta_C, cuenta_S)
 confirmed_txn, txid = TERCERO.transferir_activo(algod_client ,cuenta_C.direccion, cuenta_C.llave_privada, cuenta_S.direccion, 70, asset_id_peso)
 
 TERCERO.print_saldo_cuentas(algod_client, asset_id_peso,cuenta_C, cuenta_S)
+
+    # TRANSACCIÓN 4: SAT (S) ------> Hospital (H); (S) envía activo (peso) al Hospital (H)
+print(f"\n### (S) enviando activo (peso) al Hospital (H) ###")
+
+confirmed_txn, txid = TERCERO.opt_in(algod_client, asset_id_peso, cuenta_H.direccion, cuenta_H.llave_privada)
+
+TERCERO.print_saldo_cuentas(algod_client, asset_id_peso,cuenta_S, cuenta_H)
+
+confirmed_txn, txid = TERCERO.transferir_activo(algod_client ,cuenta_S.direccion, cuenta_S.llave_privada, cuenta_H.direccion, 40, asset_id_peso)
+
+TERCERO.print_saldo_cuentas(algod_client, asset_id_peso,cuenta_S, cuenta_H)
+
+# Creando activo caja_jer
+activo_2_nombre = "caja_jer"
+activo_2_unidad = "jeringa"
+creador_activo_2 = "H"
+
+print(f"\n### Creando activo {activo_2_nombre} ###")
+print(f"Cuenta creadora del activo {activo_2_unidad} es ({creador_activo_2}), con dirección: {cuenta_H.direccion}\n")
+
+# ¡Importante¡: No olvides añadir fondos a la cuenta creadora del activo
+# URL: https://testnet.algoexplorer.io/dispenser
+#input(f"Presiona enter hasta haber añadido fondos a la cuenta del creador del activo:{creador_del_activo.direccion}\n")
+
+# Revisando saldo de la cuenta
+saldo_H, account_info_H = SEGUNDO.verficar_balance_cuenta(algod_client, cuenta_H.direccion)
+print(f"Saldo de la cuenta ({creador_activo_2}) es: {saldo_BM} microAlgos\n")
+
+if(saldo_H > 10000):
+    # Creamos un activo
+    '''
+        El activo MXN tendrá las siguientes características:
+        1. Sera creado por el Banco de México (BM)
+        2. Será administrado por el Banco de México (BM)
+        3. La cuenta de reserva será la cuenta del Banco de México (BM)
+        4. La cuenta de congelación será la cuenta del Banco de México (BM)
+        5. La cuenta de revocación será la cuenta del Banco de México (BM)
+    '''
+    sender = cuenta_H.direccion
+    sender_pk = cuenta_H.llave_privada
+    manager = cuenta_H.direccion
+    reserve = cuenta_H.direccion
+    freeze = cuenta_H.direccion
+    clawback = cuenta_H.direccion
+
+    confirmed_txn_activo_2, tx_id_activo_2 = TERCERO.crear_activo(algod_client, sender_pk, sender, manager, reserve, freeze, clawback, asset_name=activo_1_nombre, unit_name=activo_1_unidad) # Max 8 caracteres para ambos unit_name y asset_name
+
+    TERCERO.imprimir_transaccion_activo(algod_client, confirmed_txn_activo_2, tx_id_activo_2, cuenta_H.direccion)
+else:
+    print("No hay fondos suficientes en la cuenta para crear el activo.")
