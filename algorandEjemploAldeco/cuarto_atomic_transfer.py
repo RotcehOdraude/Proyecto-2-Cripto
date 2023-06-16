@@ -1,6 +1,7 @@
 import json
 from algosdk.v2client import algod
 from algosdk import mnemonic, account, transaction
+from algorandEjemploAldeco.primero_crearCuenta import Cuenta
 
 # Este ejemplo requiere de 3 cuentas, la cuenta 1 y 2 se asume ya han sido creadas
 #  - account_1 necesita de 1001000 microAlgos
@@ -36,8 +37,81 @@ def generate_new_account():
 # Funcion para mostrar el balance de una cuenta
 def display_account_algo_balance(client, address):
     account_info = client.account_info(address)
-    print("{}: {} microAlgos".format(address, account_info["amount"]))
+    print("... {}: {} microAlgos".format(address, account_info["amount"]))
 
+def intercambio_activo_grupo(algod_client, lista_de_cuentas):
+    '''
+    params = algod_client.suggested_params()
+
+    txn = AssetTransferTxn(
+        sender = sender_address,
+        sp = params,
+        receiver = receiver_adderss,
+        amt = amount,
+        index = asset_id)
+    
+    # Se firma la transacción
+    stxn = SEGUNDO.firmar_transaccion(txn,sender_private_key)
+
+    # Se envia la transacción a la red
+    confirmed_txn, txid = SEGUNDO.enviar_transaccion(algod_client,stxn)
+    print("... Activo transferido")
+
+    return confirmed_txn, txid
+    '''
+
+    params = algod_client.suggested_params()
+
+    print("\n... Creating transactions")
+    lista_de_transacciones = []
+
+    for sender,receiver,amount,asset_id in lista_de_cuentas:
+        txn = transaction.AssetTransferTxn(sender.direccion, params, receiver.direccion, amount, asset_id)
+        lista_de_transacciones.append((txn,sender))
+        print("... txn: from {} to {} for {} microAlgos".format(sender.nombre_cuenta, receiver.nombre_cuenta, amount))
+        print("... created txn: ", txn.get_txid())
+
+    print("\n... Grouping transactions")
+    # calcular el id de grupo e incluirlo en cada transaccion
+    
+    group_id = transaction.calculate_group_id([txn for txn,_ in lista_de_transacciones])
+    print("... computed groupId: ", group_id)
+    for txn, _ in lista_de_transacciones:
+        txn.group = group_id
+    
+    # firmando transacciones
+    print("\n... Signing transactions")
+    lista_de_transacciones_firmadas = []
+    for txn,sender in lista_de_transacciones:
+        signed_txn = txn.sign(sender.llave_privada)
+        print(f"... account:{sender.nombre_cuenta} signed tx:{signed_txn.get_txid()}")
+        lista_de_transacciones_firmadas.append(signed_txn)
+
+    # creando el grupo de transacciones
+    print("\n... Assembling transaction group")
+    signedGroup = []
+    for stxn in lista_de_transacciones_firmadas:
+        signedGroup.append(stxn)
+
+    # enviando grupo de transacciones
+    print("\n... Sending transaction group")
+    tx_id = algod_client.send_transactions(signedGroup)
+
+    # esperando confirmacion
+    confirmed_txn = transaction.wait_for_confirmation(algod_client, tx_id, 4)
+    print("\n... txID: {}".format(tx_id), " confirmed in round: {}".format(confirmed_txn.get("confirmed-round", 0)))   
+
+    # imprimiendo balances
+    print("\n... Final balances:")
+    for sender,receiver,amount, _ in lista_de_cuentas:
+        display_account_algo_balance(algod_client, sender.direccion)
+        display_account_algo_balance(algod_client, receiver.direccion)
+        print()
+
+    # mostrando confirmaciones de transacciones
+    for txn,_ in lista_de_transacciones:
+        confirmed_txn = algod_client.pending_transaction_info(txn.get_txid())
+        print("\nTransaction information: {}".format(json.dumps(confirmed_txn, indent=4)))
 
 def group_transactions():
     

@@ -149,7 +149,7 @@ def opt_in(algod_client, asset_id, opt_adress,opt_private_key):
 
     saldo, account_info = SEGUNDO.verficar_balance_cuenta(algod_client,opt_adress)
     print(f"... Opt-transaction:")
-    print(f"    - opt-adress: {opt_adress}")
+    print(f"    - account-adress: {opt_adress}")
     print(f"    - Balance: {saldo} microAlgos\n")
 
     for my_account_info in account_info['assets']:

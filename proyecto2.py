@@ -2,6 +2,8 @@ import os
 import algorandEjemploAldeco.primero_crearCuenta as PRIMERO
 import algorandEjemploAldeco.segundo_first_transaction_example as SEGUNDO
 import algorandEjemploAldeco.tercero_admin_asset as TERCERO
+import algorandEjemploAldeco.cuarto_atomic_transfer as CUARTO
+
 ### CREACION DE CUENTAS INVOLUCRADAS EN EL PROYECTO ####
 '''
 1. (BM) Banco de Mexico: Este es el ente que creara la moneda digital a ser utilizada como dinero fiat.
@@ -29,6 +31,9 @@ if os.path.exists(nombre_archivo):
     cuenta_P = lista_de_cuentas[4]
     cuenta_D = lista_de_cuentas[5]
     cuenta_E = lista_de_cuentas[6]
+    cuenta_Paciente1 = lista_de_cuentas[7]
+    cuenta_Paciente2 = lista_de_cuentas[8]
+
 else:
     # Si el archivo con las direcciones de las cuentas y sus PKs no existe, entonces se crean nuevas cuentas.
     # Generando llave privada de cuenta A y su dirección
@@ -41,6 +46,8 @@ else:
     cuenta_P, _ = PRIMERO.generar_cuenta()
     cuenta_D, _ = PRIMERO.generar_cuenta()
     cuenta_E, _ = PRIMERO.generar_cuenta()
+    cuenta_Paciente1 = PRIMERO.generar_cuenta()
+    cuenta_Paciente2 = PRIMERO.generar_cuenta()
 
     lista_de_cuentas = [cuenta_BM, cuenta_C, cuenta_S, cuenta_H, cuenta_P, cuenta_D, cuenta_E]
 
@@ -64,6 +71,8 @@ print("Cuenta H:", cuenta_H.direccion)
 print("Cuenta P:", cuenta_P.direccion)
 print("Cuenta D:", cuenta_D.direccion)
 print("Cuenta E:", cuenta_E.direccion)
+
+input(f"Presiona enter hasta haber añadido fondos a la(s) cuenta(s)\n")
 
 ### CREACION DE ACTIVOS ###
 '''
@@ -185,6 +194,7 @@ confirmed_txn, txid = TERCERO.transferir_activo(algod_client ,cuenta_S.direccion
 
 TERCERO.print_saldo_cuentas(algod_client, asset_id_peso,cuenta_S, cuenta_H)
 
+    # TRANSACCIÓN 5: PROVEEDOR (P) crea activo (caja de jeringas);
 # Creando activo caja_jer (caja de jeringas) 
 activo_2_nombre = "caja_jer"
 activo_2_unidad = "jeringa"
@@ -195,7 +205,7 @@ print(f"Cuenta creadora del activo {activo_2_unidad} es ({creador_activo_2}), co
 
 # ¡Importante¡: No olvides añadir fondos a la cuenta creadora del activo
 # URL: https://testnet.algoexplorer.io/dispenser
-#input(f"Presiona enter hasta haber añadido fondos a la cuenta del creador del activo:{creador_del_activo.direccion}\n")
+
 
 # Revisando saldo de la cuenta
 saldo_P, account_info_P = SEGUNDO.verficar_balance_cuenta(algod_client, cuenta_P.direccion)
@@ -227,3 +237,18 @@ else:
     print("No hay fondos suficientes en la cuenta para crear el activo.")
 
 #TERCERO.print_saldo_cuentas(algod_client, asset_id_jeringas,cuenta_P, cuenta_P)
+
+
+########## TRANSACCION CIRCULAR ##########
+    # TRANSACCIÓN 6: Hospital (H) ------> Proveedores (P); (H) envía activo (peso) al proveedor (P)
+    # TRANSACIOÓN 7: Proveedores (P) ------> Hospital (H); (P) envía activo (caja de jeringas) al Hospital (H)
+
+print(f"\n### TRANSACCIÓN CIRCULAR ###")
+
+confirmed_txn, txid = TERCERO.opt_in(algod_client, asset_id_peso, cuenta_P.direccion, cuenta_P.llave_privada)
+confirmed_txn, txid = TERCERO.opt_in(algod_client, asset_id_jeringas, cuenta_H.direccion, cuenta_H.llave_privada)
+
+CUARTO.intercambio_activo_grupo(algod_client, [(cuenta_H,cuenta_P,5,asset_id_peso),(cuenta_P,cuenta_H,5,asset_id_jeringas)])
+
+
+
