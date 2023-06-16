@@ -266,5 +266,14 @@ confirmed_txn, txid = TERCERO.transferir_activo(algod_client ,cuenta_H.direccion
 
 TERCERO.print_saldo_cuentas(algod_client, asset_id_jeringas,cuenta_H, cuenta_D)
 
+    # TRANSACCIÓN 9: Doctor@ (D) ------> Paciente (P); (D) envía activo (caja de jeringas) al Paciente (P)
 
+print(f"\n### (D) enviando activo (jeringa) al Paciente (P) ###")
 
+confirmed_txn, txid = TERCERO.opt_in(algod_client, asset_id_jeringas, cuenta_Paciente1.direccion, cuenta_Paciente1.llave_privada)
+
+TERCERO.print_saldo_cuentas(algod_client, asset_id_jeringas,cuenta_D, cuenta_Paciente1)
+
+confirmed_txn, txid = TERCERO.transferir_activo(algod_client ,cuenta_D.direccion, cuenta_D.llave_privada, cuenta_Paciente1.direccion, 1, asset_id_jeringas)
+
+TERCERO.print_saldo_cuentas(algod_client, asset_id_jeringas,cuenta_D, cuenta_Paciente1)
