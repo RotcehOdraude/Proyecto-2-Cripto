@@ -17,8 +17,15 @@ def main():
     elif (argumentos[1] == "imprimir"):
         print("TOOL:", argumentos[1])
         imprimir_cuentas_existentes()
+    elif (argumentos[1] == "crear"):
+        print("TOOL:", argumentos[1])
+        crear_cuentas(argumentos[2])
 
-
+def crear_cuentas(numero_de_cuentas):
+    for i in range(int(numero_de_cuentas)):
+        print("Creando cuenta", i)
+        cuenta, _ = PRIMERO.generar_cuenta()
+        print(f"Cuenta: {cuenta.direccion}, \nClave: {cuenta.llave_privada}")
 
 def imprimir_cuentas_existentes(nombre_archivo = "cuentas.txt"):
     #nombre_archivo = "cuentas.txt"

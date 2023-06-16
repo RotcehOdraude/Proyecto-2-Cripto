@@ -63,6 +63,8 @@ cuenta_H.nombre_cuenta = "(H)"
 cuenta_P.nombre_cuenta = "(P)"
 cuenta_D.nombre_cuenta = "(D)"
 cuenta_E.nombre_cuenta = "(E)"
+cuenta_Paciente1.nombre_cuenta = "(Paciente1)"
+cuenta_Paciente2.nombre_cuenta = "(Paciente2)"
 
 print("Cuenta BM:", cuenta_BM.direccion)
 print("Cuenta C:", cuenta_C.direccion)
@@ -71,6 +73,8 @@ print("Cuenta H:", cuenta_H.direccion)
 print("Cuenta P:", cuenta_P.direccion)
 print("Cuenta D:", cuenta_D.direccion)
 print("Cuenta E:", cuenta_E.direccion)
+print("Cuenta Paciente1:", cuenta_Paciente1.direccion)
+print("Cuenta Paciente2:", cuenta_Paciente2.direccion)
 
 input(f"Presiona enter hasta haber añadido fondos a la(s) cuenta(s)\n")
 
@@ -248,7 +252,19 @@ print(f"\n### TRANSACCIÓN CIRCULAR ###")
 confirmed_txn, txid = TERCERO.opt_in(algod_client, asset_id_peso, cuenta_P.direccion, cuenta_P.llave_privada)
 confirmed_txn, txid = TERCERO.opt_in(algod_client, asset_id_jeringas, cuenta_H.direccion, cuenta_H.llave_privada)
 
-CUARTO.intercambio_activo_grupo(algod_client, [(cuenta_H,cuenta_P,5,asset_id_peso),(cuenta_P,cuenta_H,5,asset_id_jeringas)])
+CUARTO.intercambio_activo_grupo(algod_client, [(cuenta_H, cuenta_P, 5, asset_id_peso),(cuenta_P,cuenta_H ,5 ,asset_id_jeringas)])
+
+    # TRANSACCIÓN 8: Hospital (H) ------> Doctor@ (D); (H) envía activo (caja de jeringas) al Doctor@ (D)
+    # TRANSACCIÓN 8: Hospital (H) ------> Enferfer@ (E); (H) envía activo (caja de jeringas) al Enfermer@ (E)
+print(f"\n### (H) enviando activo (jeringa) al Doctor (D) ###")
+
+confirmed_txn, txid = TERCERO.opt_in(algod_client, asset_id_jeringas, cuenta_D.direccion, cuenta_D.llave_privada)
+
+TERCERO.print_saldo_cuentas(algod_client, asset_id_jeringas,cuenta_H, cuenta_D)
+
+confirmed_txn, txid = TERCERO.transferir_activo(algod_client ,cuenta_H.direccion, cuenta_H.llave_privada, cuenta_D.direccion, 3, asset_id_jeringas)
+
+TERCERO.print_saldo_cuentas(algod_client, asset_id_jeringas,cuenta_H, cuenta_D)
 
 
 
